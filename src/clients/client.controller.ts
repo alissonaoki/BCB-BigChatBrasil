@@ -1,14 +1,28 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpStatus, UseGuards } from '@nestjs/common';
-import { CreateClientDto } from './dto/create-client.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  HttpStatus,
+  Inject,
+  UseGuards,
+} from '@nestjs/common';import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { ClientsService } from './clients.service';
 import { NotFoundResponse } from 'src/common/responses/httpResponses';
 import { ApiResponse } from 'src/common/responses/api-response.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { IClientService } from './interfaces/clients-service.interface';
 
 @Controller('clients')
 export class ClientsController {
-  constructor(private readonly clientsService: ClientsService) {}
+  constructor(
+    @Inject(ClientsService)
+    private readonly clientsService: IClientService,
+  ) {}
 
   @Get()
   @UseGuards(AuthGuard) 
@@ -40,7 +54,10 @@ export class ClientsController {
   @UseGuards(AuthGuard) 
   @ApiResponse(HttpStatus.OK, 'Cliente atualizado com sucesso') 
   @ApiResponse(HttpStatus.NOT_FOUND, 'Cliente não encontrado')
-  async update(@Param('id') id: number, @Body() updateClientDto: UpdateClientDto) {
+  async update(
+    @Param('id') id: number,
+    @Body() updateClientDto: UpdateClientDto,
+  ) {
     const updatedClient = await this.clientsService.update(id, updateClientDto);
     if (!updatedClient) {
       return NotFoundResponse('Cliente não encontrado');

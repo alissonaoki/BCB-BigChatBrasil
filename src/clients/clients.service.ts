@@ -3,9 +3,10 @@ import { InjectModel } from '@nestjs/sequelize';
 import { CreateClientDto } from 'src/clients/dto/create-client.dto';
 import { Client } from 'src/clients/models/client.model';
 import { UpdateClientDto } from './dto/update-client.dto';
+import { IClientService } from './interfaces/clients-service.interface';
 
 @Injectable()
-export class ClientsService {
+export class ClientsService implements IClientService {
   constructor(
     @InjectModel(Client)
     private readonly clientModel: typeof Client,

@@ -43,4 +43,12 @@ export class Client extends Model<Client> {
 
   @HasMany(() => Finance)
   financeOperations: Finance[];
+  
+  isPrePayd() {
+    return this.paymentPlan === PaymentPlan.PRE;
+  }
+
+  isPosPayd() {
+    return this.paymentPlan === PaymentPlan.POS;
+  }
 }

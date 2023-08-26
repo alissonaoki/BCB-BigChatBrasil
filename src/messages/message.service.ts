@@ -1,50 +1,28 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { PaymentPlan } from 'src/enums/payment-plan.enum';
 import { ClientsService } from 'src/clients/clients.service';
+import { IMessageService } from './interfaces/message-service.interface';
+import { IClientService } from 'src/clients/interfaces/clients-service.interface';
+import { CostCalculationService } from './services/cost-calculation.service';
+import { ICostCalculation } from './interfaces/cost-calculation.interface';
 
 @Injectable()
-export class MessageService {
+export class MessageService implements IMessageService {
   constructor(
     @Inject(ClientsService)
-    private readonly clientsService: ClientsService,
+    private readonly clientService: IClientService,
+    @Inject(CostCalculationService)
+    private readonly clientCost: ICostCalculation,
   ) {}
 
   async createMessage(createMessageDto: CreateMessageDto) {
     // Verificar se o cliente existe
-    const client = await this.clientsService.findOne(createMessageDto.clientId);
+    const client = await this.clientService.findOne(createMessageDto.clientId);
     if (!client) {
       throw new NotFoundException('Cliente não encontrado');
     }
 
-    const messageCost = 0.25; // Custo por mensagem
-
-    switch (client.paymentPlan) {
-      case PaymentPlan.PRE:
-        // Cliente é pré-pago
-        if (client.balance < messageCost) {
-          throw new Error('Saldo insuficiente para enviar a mensagem');
-        }
-        // Deduzir o custo da mensagem do saldo do cliente
-        client.balance -= messageCost;
-        break;
-      case PaymentPlan.POS:
-        // Cliente é pós-pago
-        const creditLimit = client.maxAuthorizedLimit; // Limite de crédito pós-pago
-        if (client.balance + messageCost > creditLimit) {
-          throw new Error('Limite de crédito excedido');
-        }
-        // Incrementar a contagem de mensagens enviadas
-        client.balance += messageCost;
-        break;
-      default:
-        throw new Error('Tipo de plano de pagamento inválido');
-    }
-
-    // Implementar a lógica para enviar a mensagem, usando um serviço de mensagens externo.
-    // Firebase Cloud Messaging (FCM) 
-
-    // Salvar as alterações no cliente
+    this.clientCost.calculate(client);
     await client.save();
 
     return 'Mensagem criada e enviada com sucesso.';
