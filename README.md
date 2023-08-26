@@ -8,6 +8,7 @@
 
 * docker compose up -d
 
+* Acesso ao Documentacao da API http://localhost:3000/api
 
 Premissas Assumidas
 

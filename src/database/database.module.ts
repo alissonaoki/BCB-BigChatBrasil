@@ -6,8 +6,8 @@ import { databaseProviders } from './database.providers';
   imports: [
     SequelizeModule.forRootAsync({
       useFactory: () => ({
-        dialect: 'postgres', // ou outro banco de dados de sua escolha
-        host: process.env.DB_HOST || '172.20.0.2',
+        dialect: 'postgres', 
+        host: process.env.DB_HOST || '172.27.0.2',
         port: parseInt(process.env.DB_PORT) || 5432,
         username: process.env.DB_USERNAME || 'bcb_user',
         password: process.env.DB_PASSWORD || 'bcb_password',
