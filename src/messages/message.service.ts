@@ -39,6 +39,7 @@ export class MessageService {
     }
 
     // Implementar a lógica para enviar a mensagem, usando um serviço de mensagens externo.
+    // Firebase Cloud Messaging (FCM) 
 
     // Salvar as alterações no cliente
     await client.save();
