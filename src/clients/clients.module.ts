@@ -9,5 +9,6 @@ import { Message } from '../messages/models/message.model';
   imports: [SequelizeModule.forFeature([Client,Message])],
   controllers: [ClientsController],
   providers: [ClientsService],
+  exports: [ClientsService],
 })
 export class ClientsModule {}

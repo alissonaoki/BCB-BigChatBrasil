@@ -1,15 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { Client } from 'src/clients/models/client.model';
 import { PaymentPlan } from 'src/enums/payment-plan.enum';
+import { ClientsService } from 'src/clients/clients.service';
 
 @Injectable()
 export class MessageService {
-  constructor(private readonly clientModel: typeof Client) {}
+  constructor(
+    @Inject(ClientsService)
+    private readonly clientsService: ClientsService,
+  ) {}
 
   async createMessage(createMessageDto: CreateMessageDto) {
     // Verificar se o cliente existe
-    const client = await this.clientModel.findByPk(createMessageDto.clientId);
+    const client = await this.clientsService.findOne(createMessageDto.clientId);
     if (!client) {
       throw new NotFoundException('Cliente não encontrado');
     }
