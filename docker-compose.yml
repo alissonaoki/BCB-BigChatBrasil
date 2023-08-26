@@ -1,0 +1,21 @@
+version: '3'
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile-postgres
+    ports:
+      - "5432:5432" # Mapeia a porta 5432 do host para a porta 5432 do contêiner
+    environment:
+      POSTGRES_USER: bcb_user
+      POSTGRES_PASSWORD: bcb_password
+      POSTGRES_DB: bcb_database
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Mapeia a porta 3000 do host para a porta 3000 do contêiner
+    depends_on:
+      - postgres # Garante que o contêiner do PostgreSQL seja iniciado primeiro

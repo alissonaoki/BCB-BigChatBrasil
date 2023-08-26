@@ -1,0 +1,10 @@
+# Use a imagem oficial do PostgreSQL como base
+FROM postgres:latest
+
+# Defina variáveis de ambiente para o PostgreSQL
+ENV POSTGRES_USER=bcb_user
+ENV POSTGRES_PASSWORD=bcb_password
+ENV POSTGRES_DB=bcb_database
+
+# Exponha a porta padrão do PostgreSQL (5432)
+EXPOSE 5432
