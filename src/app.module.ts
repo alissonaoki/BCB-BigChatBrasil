@@ -5,6 +5,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { ClientsModule } from './clients/clients.module';
 import { FinanceModule } from './finance/finance.module';
 import { databaseConfig } from 'config/database.config';
+import { AuthModule } from './auth/auth.module';
+import { MessageModule } from './messages/message.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { databaseConfig } from 'config/database.config';
     }),
     ClientsModule,
     FinanceModule,
+    MessageModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
