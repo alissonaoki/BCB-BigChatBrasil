@@ -1,8 +1,7 @@
-// src/messages/message.service.ts
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Client } from 'src/clients/models/client.model';
+import { PaymentPlan } from 'src/enums/payment-plan.enum';
 
 @Injectable()
 export class MessageService {
@@ -15,18 +14,34 @@ export class MessageService {
       throw new NotFoundException('Cliente não encontrado');
     }
 
-    // Esse bloco pode ser mudado para um servico de pagamento
-    // Verificar se o cliente tem saldo suficiente
-    const messageCost = 0.25; // Custo por mensagem (ajuste conforme necessário)
-    if (client.balance < messageCost) {
-      throw new Error('Saldo insuficiente para enviar a mensagem');
+    const messageCost = 0.25; // Custo por mensagem
+
+    switch (client.paymentPlan) {
+      case PaymentPlan.PRE:
+        // Cliente é pré-pago
+        if (client.balance < messageCost) {
+          throw new Error('Saldo insuficiente para enviar a mensagem');
+        }
+        // Deduzir o custo da mensagem do saldo do cliente
+        client.balance -= messageCost;
+        break;
+      case PaymentPlan.POS:
+        // Cliente é pós-pago
+        const creditLimit = client.maxAuthorizedLimit; // Limite de crédito pós-pago
+        if (client.balance + messageCost > creditLimit) {
+          throw new Error('Limite de crédito excedido');
+        }
+        // Incrementar a contagem de mensagens enviadas
+        client.balance += messageCost;
+        break;
+      default:
+        throw new Error('Tipo de plano de pagamento inválido');
     }
 
-    // Deduzir o custo da mensagem do saldo do cliente
-    client.balance -= messageCost;
-    await client.save();
+    // Implementar a lógica para enviar a mensagem, usando um serviço de mensagens externo.
 
-    //implementar a lógica para enviar a mensagem, usar um serviço de mensagens externo.
+    // Salvar as alterações no cliente
+    await client.save();
 
     return 'Mensagem criada e enviada com sucesso.';
   }
