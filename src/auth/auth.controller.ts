@@ -7,18 +7,20 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() credentials: { username: string; password: string }) {
-    
-    const user = await this.authService.authenticateUser(
-      credentials.username,
-      credentials.password,
-    );
+    try {
+      // Autenticação do usuário
+      const user = await this.authService.validateUser(
+        credentials.username,
+        credentials.password,
+      );
 
-    if (!user) {
+      // Geração de token JWT
+      const accessToken = await this.authService.generateAccessToken(user);
+
+      // Retorne o token JWT para o cliente
+      return { accessToken };
+    } catch (error) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
-
-    const accessToken = this.authService.generateAccessToken(user.id);
-
-    return { accessToken };
   }
 }

@@ -1,31 +1,25 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  private readonly jwtSecret = 'seu_segredo_jwt';
+  constructor(private readonly jwtService: JwtService) {}
 
- 
-  generateAccessToken(userId: number): string {
-    const payload = { userId };
-    return jwt.sign(payload, this.jwtSecret, { expiresIn: '10h' });
+  async validateUser(username: string, password: string) {
+    
+    const user = { name: username,
+                   password: password } //await yourUserService.findUserByUsername(username);
+
+    // Logica temporaria so para passar validacao sera implementada posteriormente
+    if (!user || user.password !== password) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+   
+    return user;
   }
 
-  async validateAccessToken(token: string): Promise<any> {
-    try {
-      return jwt.verify(token, this.jwtSecret);
-    } catch (error) {
-      throw new UnauthorizedException('Token JWT inválido ou expirado');
-    }
-  }
-
-  async authenticateUser(username: string, password: string): Promise<{ id: number } | null> {
-    // A implementar
-
-    if (username === 'usuario' && password === 'senha') {
-      return { id: 1 };
-    }
-
-    return null;
+  async generateAccessToken(user: any): Promise<string> {
+    const payload = { username: user.username, sub: user.userId };
+    return this.jwtService.sign(payload);
   }
 }
